@@ -116,6 +116,34 @@ GPT & 0.198 & 0.185 & 0.160 & 0.042 & 0.044 & 0.037 \\
 \caption{Pearson $r$ for predicting average channel-wise activity over a word using a feature ensemble including GPT2-XL embeddings, articulation, timing, etc.}
 \end{table}
 
+\subsection{Comparison with prior LLM encoding studies}
+
+\textbf{Single neurons:} \citet{cai2026language} predicted the mean firing rate of all units in a session (100\,ms bins, 3-bin smoothing) during natural conversation from the Vicuna-7B embedding of the word being spoken, reduced to 30 principal components and repeated over each bin of the word. Ridge regression was fit with leave-one-sentence-out cross-validation at lags from $-2$ to $2$\,s. Population predictivity was $r=.05$ (peak $r=.07$ at layer 14, $-1$\,s). No noise ceiling, articulatory control or preceding-word control was reported. Their $-1$\,s peak coincides with ours, where adding the identity and timing of the three preceding words reduced the context-only GPT contribution for the area-6v mean from $r=.159$ to $.081$.
+
+\textbf{fMRI:} \citet{antonello2024generative} fit voxelwise ridge models from LLaMA-30B features on ${\sim}20$\,h of narrative listening per subject. Test responses were averaged over 5--10 repeats. Mean test $r$ was $.13$ across cortex. However, only voxels with $r>.15$ (the top ${\sim}40\%$) were explained, with mean $r=.35$ and many exceeding $.7$. A 35-question interpretable model reached a whole-cortex $r=.097$ on the same dataset \cite{singh2025evaluating}.
+
+\textbf{T12 per channel:} Uncontrolled GPT reached $r>.15$ on 117 of 128 area-6v channels (median $.24$, max $.46$) but on no area-44 channels. The articulation control alone predicted better (median $.29$). With articulation, word identity and the three preceding words controlled, no channel exceeded $r=.09$ (6v) or $.05$ (44) (Table~\ref{tab:compare}). Only 118 of 9,562 sentences were repeated. The resulting sentence-level noise ceilings (median $.37$ in 6v, $.21$ in 44) have wide confidence intervals, and a lower bound above zero on only 43 and 13 channels.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{llc}
+\toprule
+Study & Target & $r$ \\
+\midrule
+\citet{antonello2024generative}, fMRI & all cortical voxels & .13 \\
+ & explained voxels ($r>.15$) & .35 \\
+\citet{singh2025evaluating}, fMRI & all cortical voxels & .10 \\
+\citet{cai2026language}, single units & session population mean & .05 \\
+T12, uncontrolled & best channel, 6v / 44 & .46 / .14 \\
+T12, controlled & best channel, 6v / 44 & .09 / .05 \\
+\bottomrule
+\end{tabular}
+\caption{Cross-validated Pearson $r$ between LLM-based encoding models and neural activity. T12 values are the per-channel peak over lags. Controlled values remove articulation, word identity and the three preceding words.}
+\label{tab:compare}
+\end{table}
+
+Raw correlations from fMRI and intracortical recordings are therefore similar when averaged over all voxels or units. The strength of fMRI encoding comes from repeat-averaged test data, temporal pooling within a 2\,s TR, selection of well-predicted voxels and passive listening without motor output. None of these hold for attempted speech in T12. No channel shows a strong LLM correlation once articulation is controlled, so explanation methods built on reliable per-voxel encoding models \cite{antonello2024generative} are not yet supported by these data. Comprehension tasks with repeated test stimuli would be needed.
+
 \bibliographystyle{unsrtnat}
 \bibliography{refs}
 
