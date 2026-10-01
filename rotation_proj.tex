@@ -1,0 +1,122 @@
+\documentclass[11pt]{article}
+
+\usepackage{parskip}
+\usepackage{tabularx}
+\usepackage{wrapfig}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage[super,sort&compress]{natbib} % drop "numbers" for author-year citations
+\usepackage[colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue]{hyperref}
+
+\setlist{itemsep=2pt, topsep=4pt}
+
+\title{Probing intracortical recordings from the language-related cortex with large language models}
+\date{}
+\author{}
+
+\begin{document}
+\maketitle
+
+\vspace{-1cm}
+\section{Introduction}
+Decoding phonemes from neural activity recorded by intracortical electrodes in the motor cortex has enabled the restoration of rapid communication to people with paralysis during both attempted and inner speech  \cite{willett2023speech}\cite{kunz2025innerspeech}. Increasingly, semantic encoding has been explored from recorded activity in language-related areas not implicated in speech and articulation \cite{jamali2024semantic}\cite{cai2026language}, potentially unlocking communication prosthetics for stroke victims when the motor cortex has been damaged. Correlating neural activity record from functional Magnetic Resonance Imaging (fMRI) with hand-constructed linguistic tasks has been effective at partitioning the language network into increasingly granular functional sub-regions \cite{Price2012}\cite{clos2013tackling}. Intra-cortical recordings enable the further exploration of language tuning down to the scale of neural populations, yet motivate the need for further methods to help discover fine-grained linguistic features that specify regional functionality of neural populations within the recorded area. Previously, large language models (LLMs) have been used to evaluate millions of sentences in parallel and extract those most likely to drive and suppress average blood-oxygen-level-dependent (BOLD) response in the language network from fMRI \cite{tuckute2023driving}. Here we adopt a similar approach and use LLMs to efficiently find language features from intracortical recordings in the human language network.
+
+\section{Background}
+
+\begin{wraptable}{l}{0.64\textwidth}
+    \centering
+    \small
+    \setlength{\tabcolsep}{3pt}
+    \renewcommand{\arraystretch}{1.15}
+    \vspace{-.4cm}
+    \label{tab:ba44-clusters}
+    \begin{tabularx}{\linewidth}{
+        @{}l
+        >{\raggedright\arraybackslash}p{0.25\linewidth}
+        >{\raggedright\arraybackslash}X@{}
+    }
+        \toprule
+        Cluster & Location & Functional associations \\
+        \midrule
+        C1 & Posterior-dorsal &
+        Phonology, syntax, overt speech, action imagery \\
+        C2 & Anterior-dorsal &
+        Working memory, semantics, orthography, covert speech \\
+        C3 & Anterior-ventral &
+        Semantics, syntax, phonology, overt and covert speech \\
+        C4 & Posterior-ventral &
+        Action imagery, music comprehension and production,
+        rhythmic sequencing \\
+        C5 & Inferior frontal junction &
+        Cognitive control, task switching, working memory,
+        speech, phonology, semantics \\
+        \bottomrule
+    \end{tabularx}
+\end{wraptable}
+
+\subsection{Review of anatomy and functional behavior of implanted regions}
+
+Recordings were obtained from two study participants in the BrianGate research consortium. Participant T20 had two intracortical arrays implanted in left-hemisphere 6v, two in 55b and two in Brodmann's Area (BA) 45. T12 had two arrays in left-hemisphere 6v and two in BA 44. BA 44 and BA 45 are sub-areas based on cellular organization of tissue within Broca's area \cite{brodmann1909vergleichende}. \citet{clos2013tackling} further subdivided left BA~44 into five
+clusters using meta-analytic coactivation-based parcellation (CBP).
+Their functional associations are summarized in
+Table~\ref{tab:ba44-clusters}.
+
+\subsection{Driving and suppressing average BOLD response in the human language network  with LLMs}
+
+The hidden activations of large language models have been shown to predict nearly all explainable variance in neural responses to sentences across multiple imaging modalities \cite{schrimpf2021neural}. \citet{tuckute2023driving} used these hidden activations to evaluate millions of sentences and extract those most likely to drive and suppress the average BOLD responses from five train participants who read a set of 1,000 diverse, corpus-extracted sentences. An encoding model was trained via ridge regression and achieved a prediction performance of $r=.39$ (the noise ceiling is $r=.56$) when evaluated on average BOLD activity from the left-hemisphere language network during held-out sentences within the baseline set. Approximately 1.8 million sentences from nine diverse large-scale text corpora were evaluated and a set of 250 sentences extracted  that were predicted to elicit maximally strong activity in the language network.
+
+\section{LLM-driven feature discovery from intra-cortical recordings from the human language-cortex}
+
+Due to the low spatial and temporal resolution of fMRI, fine-grained properties cannot be targeted beyond general increases in average BOLD response to entire sentences. A major aim of studying semantic encoding in the human language network is to uncover how the brain tunes to semantic structure at the level of individual neurons and semantic dynamics with a single-sentence. Therefore, we introduce interpretable and information optimal regression targets that will help uncover bio-mechanistically interpretable structure in language space.
+
+\section{Results}
+\subsection{LLM encdoings of Brain-to-Text 2024}
+
+Participant T12 from the brain-gate consortium\cite{willett2023speech} attempted to speak 9,680 sentences (9,562 unique) across 24 sessions. Activity was recorded on four 64-electrode Utah arrays: two in area 6v (ventral premotor cortex) and two in area 44 (inferior frontal gyrus, part of Broca's area). Each trial comprised an instructed delay (about 8\,s, sentence on screen) followed by a go cue and the attempted-speech period.
+
+\textbf{Average-over-sentence regression:} We used ridge regression to predict the average activity over a sentence for each channel from the GPT2-XL layer-22 representation of the sentence's last token. \cite{radford2019language} (previously found to have predictive power over the language network in fMRI). To separate GPT from sentence length, we fit a regression over length features (words, tokens, characters, duration, speaking rate). GPT yielded slightly higher correlations than length features alone in both areas (Table~\ref{tab:sentence}), although correlations were weak overall. These findings suggest that first) average activity from intra-cortical recordings demonstrates weak correlation with GPT2-XL features relative to average BOLD response over the language network and second) there is an encoding signal beyond sentence length features from average channel-wise activity motivating the need for a more expressive regression target.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lcc}
+\toprule
+Model & Area 6v & Area 44 \\
+\midrule
+Length features & 0.101 & 0.025 \\
+GPT & 0.109 & 0.072 \\
+\bottomrule
+\end{tabular}
+\caption{Pearson $r$ for predicting average channel-wise activity over a sentence using length features (words, tokens, characters, duration, and speaking rate) or GPT2-XL layer-22 representations of the sentence's last token.}
+\label{tab:sentence}
+\end{table}
+
+\textbf{Average-over-word regression:} To obtain word timing, we ported the published baseline decoder RNN of \citet{willett2023speech} that reads area 6v only. For each trial we computed the most likely timing of the known phoneme sequence under the decoder's output by CTC forced alignment \cite{graves2006connectionist}. Decoding gave a held-out phoneme error rate of 19\%. Following \citet{goldstein2022shared}, samples were words. For word $w$ with onset $t_w$, channel $c$ and lag $\tau \in [-1, 1]$\,s in 40\,ms steps, the target was
+\begin{equation}
+y_{w,c}(\tau) = \tilde{x}_c(t_w + \tau),
+\end{equation}
+where $\tilde{x}_c$ is the continuous recording, z-scored within recording block and smoothed with a 40\,ms Gaussian. Early lags can therefore reach into the delay period. A separate ridge model was fitted for each lag and channel using the GPT2-XL layer-22 state at the word's last sub-token, suprisal, articulation, timing, identity, and related features for the surrounding words. The control permuted GPT vectors among words with the same number of phonemes. 
+
+\begin{table}[h]
+\centering
+\label{tab:lagged}
+\begin{tabular}{lcccccc}
+\toprule
+ & \multicolumn{3}{c}{Area 6v} & \multicolumn{3}{c}{Area 44} \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}
+Model & $-1000$ & $0$ & $+600$\,ms & $-1000$ & $0$ & $+600$\,ms \\
+\midrule
+Control & 0.219 & 0.241 & 0.225 & 0.035 & 0.041 & 0.041 \\
+GPT & 0.198 & 0.185 & 0.160 & 0.042 & 0.044 & 0.037 \\
+\bottomrule
+\end{tabular}
+\caption{Pearson $r$ for predicting average channel-wise activity over a word using a feature ensemble including GPT2-XL embeddings, articulation, timing, etc.}
+\end{table}
+
+\bibliographystyle{unsrtnat}
+\bibliography{refs}
+
+\end{document}
